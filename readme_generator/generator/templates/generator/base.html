@@ -1,0 +1,302 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}AI README Generator{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link 
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" 
+      rel="stylesheet"
+    />
+    <!-- GitHub Markdown CSS -->
+    <link 
+      href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css" 
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Syntax highlighting -->
+    <link 
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" 
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <style>
+      :root {
+        --primary-color: #0d6efd;
+        --secondary-color: #6c757d;
+        --accent-color: #0dcaf0;
+        --dark-color: #212529;
+        --light-color: #f8f9fa;
+        --border-color: #dee2e6;
+        --success-color: #198754;
+      }
+      
+      body {
+        background-color: #f6f8fa;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        color: #24292f;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .navbar {
+        background-color: #ffffff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      
+      .navbar-brand {
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .navbar-brand svg {
+        margin-right: 6px;
+      }
+      
+      .main-container {
+        flex: 1;
+        padding: 2rem 1rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      
+      .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+        overflow: hidden;
+      }
+      
+      .card-header {
+        background-color: #ffffff;
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 1.5rem;
+      }
+      
+      .card-body {
+        padding: 1.5rem;
+      }
+      
+      .btn {
+        border-radius: 6px;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+      }
+      
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+      
+      .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+        transform: translateY(-1px);
+      }
+      
+      .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+      }
+      
+      .btn-success:hover {
+        background-color: #157347;
+        border-color: #146c43;
+        transform: translateY(-1px);
+      }
+      
+      .form-control {
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      }
+      
+      .input-group-text {
+        border-radius: 6px 0 0 6px;
+        padding: 0.75rem 1rem;
+      }
+      
+      /* Markdown styling */
+      .markdown-body {
+        background-color: white;
+        border: 1px solid #d0d7de;
+        border-radius: 8px;
+        color: #24292f;
+        padding: 2rem;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      }
+      
+      .markdown-body pre {
+        background-color: #f6f8fa;
+        border-radius: 6px;
+      }
+      
+      .markdown-body code {
+        background-color: rgba(175, 184, 193, 0.2);
+        border-radius: 6px;
+        padding: 0.2em 0.4em;
+        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+      }
+      
+      .markdown-body h1, .markdown-body h2 {
+        border-bottom: 1px solid #d8dee4;
+        padding-bottom: 0.3em;
+      }
+      
+      /* Editor styling */
+      .editor-container {
+        display: flex;
+        height: calc(100vh - 250px);
+        min-height: 500px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+      }
+      
+      .editor-pane, .preview-pane {
+        flex: 1;
+        overflow: auto;
+        padding: 0;
+      }
+      
+      .editor-pane {
+        border-right: 1px solid var(--border-color);
+      }
+      
+      .full-height-textarea {
+        height: 100%;
+        border: none;
+        resize: none;
+        padding: 1rem;
+        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      
+      .preview-content {
+        height: 100%;
+        overflow: auto;
+        padding: 1rem;
+      }
+      
+      /* Footer */
+      .footer {
+        background-color: #ffffff;
+        padding: 1rem 0;
+        text-align: center;
+        font-size: 0.875rem;
+        color: var(--secondary-color);
+        border-top: 1px solid var(--border-color);
+        margin-top: 2rem;
+      }
+      
+      /* Animations */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      
+      /* Loading spinner */
+      .progress {
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .editor-container {
+          flex-direction: column;
+          height: auto;
+        }
+        
+        .editor-pane, .preview-pane {
+          height: 400px;
+        }
+        
+        .editor-pane {
+          border-right: none;
+          border-bottom: 1px solid var(--border-color);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
+            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
+            <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+          </svg>
+          README Generator
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/tanmaygupta1008" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.7-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                GitHub
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+      {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p class="mb-0"> 2025 README Generator | Powered by Google Gemini AI</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Initialize syntax highlighting
+        document.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightBlock(block);
+        });
+      });
+    </script>
+  </body>
+</html>
