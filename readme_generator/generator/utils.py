@@ -6,8 +6,9 @@ import os
 api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
     raise ValueError("GEMINI_API_KEY environment variable not set")
-    
+
 genai.configure(api_key=api_key)
+
 
 def fetch_repo_details(repo_url):
     """Fetches repository details using GitHub API and analyzes the tech stack."""
@@ -47,7 +48,7 @@ def fetch_repo_details(repo_url):
 
     # Fetch code samples from key files
     code_samples = fetch_code_samples(owner, repo, contents_data)
-    
+
     # Detect Technologies
     tech_stack = detect_technologies(repo_info["files"], languages_data)
 
@@ -128,7 +129,7 @@ def generate_readme(repo_info, tech_stack, code_samples):
         code_samples_text = "Here are some code samples from the repository:\n\n"
         for sample in code_samples:
             code_samples_text += f"**{sample['name']}**:\n```{sample['language']}\n{sample['content']}\n```\n\n"
-    
+
     # Analyze code samples for API calls
     api_calls = detect_api_calls(code_samples)
     api_section = ""
@@ -169,7 +170,7 @@ def generate_readme(repo_info, tech_stack, code_samples):
     Only generate the README.md content.
     """
 
-    model = genai.GenerativeModel("gemini-1.5-pro")
+    model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(prompt)
 
     return response.text  # Return the generated README content
@@ -190,9 +191,9 @@ def detect_api_calls(code_samples):
         "requests.get\\(": {"name": "HTTP Requests", "description": "Making HTTP requests to external services."},
         "http.get\\(": {"name": "HTTP Client", "description": "Making HTTP requests to external services."},
     }
-    
+
     detected_apis = []
-    
+
     import re
     for sample in code_samples:
         content = sample["content"]
@@ -200,5 +201,5 @@ def detect_api_calls(code_samples):
             if re.search(pattern, content):
                 if api_info not in detected_apis:
                     detected_apis.append(api_info)
-    
+
     return detected_apis
